@@ -2,46 +2,66 @@
 <!-- Copyright 2019 Tecnativa - Victor M.M. Torres
      License LGPL-3.0 or later (http://www.gnu.org/licenses/lgpl). -->
 <odoo>
-    <template id="products_attributes" inherit_id="website_sale.products_attributes">
-        <xpath
-            expr="//t[@t-if=&quot;a.display_type == 'select'&quot;]//t[@t-foreach='a.value_ids']/option"
-            position="attributes"
-        >
-            <attribute
-                name="t-if"
-            >not attr_values_used_ids or v.id in attr_values_used_ids</attribute>
-        </xpath>
-        <xpath
-            expr="//div[@t-elif=&quot;a.display_type in ('radio', 'pills', 'multi')&quot;]//t[@t-foreach='a.value_ids']"
-            position="attributes"
-        >
-            <attribute
-                name="t-if"
-            >not attr_values_used_ids or v.id in attr_values_used_ids</attribute>
-        </xpath>
-        <xpath expr="//t[@t-as='a']/t[@t-cache]" position="attributes">
-            <attribute name="t-cache" add="attr_values_used_ids" separator="," />
-        </xpath>
-    </template>
-    <template id="o_wsale_offcanvas" inherit_id="website_sale.o_wsale_offcanvas">
-        <xpath expr="//t[@t-foreach='a.value_ids']" position="attributes">
-            <attribute
-                name="t-if"
-            >not attr_values_used_ids or v.id in attr_values_used_ids</attribute>
-        </xpath>
-        <xpath expr="//input[@name='attribute_value']/../.." position="attributes">
-            <attribute
-                name="t-if"
-            >not attr_values_used_ids or v.id in attr_values_used_ids</attribute>
-        </xpath>
-        <xpath expr="//t[@t-as='a']/t[@t-cache]" position="attributes">
-            <attribute name="t-cache" add="attr_values_used_ids" separator="," />
-        </xpath>
-    </template>
+    <!-- Color attributes: add t-if per iteration -->
     <template
-        id="o_wsale_offcanvas_color_attribute"
-        inherit_id="website_sale.o_wsale_offcanvas_color_attribute"
+        id="filter_color_attributes"
+        inherit_id="website_sale.filter_color_attributes"
     >
+        <xpath expr="//t[@t-foreach='a.value_ids']/label" position="attributes">
+            <attribute
+                name="t-if"
+            >not attr_values_used_ids or v.id in attr_values_used_ids</attribute>
+        </xpath>
+    </template>
+
+    <!-- Image attributes: add t-if per iteration -->
+    <template
+        id="filter_image_attributes"
+        inherit_id="website_sale.filter_image_attributes"
+    >
+        <xpath expr="//t[@t-foreach='a.value_ids']/label" position="attributes">
+            <attribute
+                name="t-if"
+            >not attr_values_used_ids or v.id in attr_values_used_ids</attribute>
+        </xpath>
+    </template>
+
+    <!-- Select attributes: add t-if on each option -->
+    <template
+        id="filter_select_attributes"
+        inherit_id="website_sale.filter_select_attributes"
+    >
+        <xpath expr="//t[@t-foreach='a.value_ids']/option" position="attributes">
+            <attribute
+                name="t-if"
+            >not attr_values_used_ids or v.id in attr_values_used_ids</attribute>
+        </xpath>
+    </template>
+
+    <!-- Radio/Multi attributes: filter sorted_values at source to cover all branches -->
+    <template
+        id="filter_radio_and_multi_attributes"
+        inherit_id="website_sale.filter_radio_and_multi_attributes"
+    >
+        <xpath expr="//t[@t-set='sorted_values']" position="after">
+            <t
+                t-if="attr_values_used_ids"
+                t-set="sorted_values"
+                t-value="[v for v in sorted_values if v.id in attr_values_used_ids]"
+            />
+        </xpath>
+    </template>
+
+    <!-- Pills attributes: add t-if on each input+label pair -->
+    <template
+        id="filter_pills_attributes"
+        inherit_id="website_sale.filter_pills_attributes"
+    >
+        <xpath expr="//t[@t-foreach='a.value_ids']/input" position="attributes">
+            <attribute
+                name="t-if"
+            >not attr_values_used_ids or v.id in attr_values_used_ids</attribute>
+        </xpath>
         <xpath expr="//t[@t-foreach='a.value_ids']/label" position="attributes">
             <attribute
                 name="t-if"
